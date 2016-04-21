@@ -55,6 +55,9 @@ public class DataAdapter extends BaseAdapter
             viewHolder=(ViewHolder)convertView.getTag();
         }
         viewHolder.icon.setImageResource(R.drawable.d);
+        viewHolder.icon.setTag(mlist.get(position).imageIconURL);
+//        new ImageLoader().showImageByThread(viewHolder.icon, mlist.get(position).imageIconURL);
+        new ImageLoader().showImageByAsyncTask(viewHolder.icon, mlist.get(position).imageIconURL);
         viewHolder.tvId.setText(mlist.get(position).userId);
         viewHolder.tvName.setText(mlist.get(position).userName);
         return convertView;
