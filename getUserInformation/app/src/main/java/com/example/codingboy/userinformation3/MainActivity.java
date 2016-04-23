@@ -21,7 +21,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private  ListView listView;
+    private  ListView mListView;
     private  EditText inputMessage;
     private Button sendMessage;
     private DataBean dataBean;
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        listView= (ListView) findViewById(R.id.lv_main);
+        mListView= (ListView) findViewById(R.id.lv_main);
         inputMessage= (EditText) findViewById(R.id.inputMessage);
         sendMessage= (Button) findViewById(R.id.sendMessage);
 
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         {
             super.onPostExecute(dataBeanList);
             DataAdapter adapter=new DataAdapter(MainActivity.this,dataBeanList);
-            listView.setAdapter(adapter);
+            mListView.setAdapter(adapter);
         }
     }
 }
