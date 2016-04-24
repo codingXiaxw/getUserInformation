@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(List<DataBean> dataBeanList)
         {
             super.onPostExecute(dataBeanList);
-            DataAdapter adapter=new DataAdapter(MainActivity.this,dataBeanList);
+            DataAdapter adapter=new DataAdapter(MainActivity.this,dataBeanList,mListView);
             mListView.setAdapter(adapter);
         }
     }

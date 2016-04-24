@@ -18,19 +18,26 @@ import java.util.Stack;
 /**
  * Created by codingBoy on 16/4/18.
  */
-public class DataAdapter extends BaseAdapter
+public class DataAdapter extends BaseAdapter implements AbsListView.OnScrollListener
 {
     List<DataBean> mlist;
     private LayoutInflater inflater;
     private ImageLoader mImageLoader;
+    private int mStart,mEnd;
+    public static String [] URLS;
+    private boolean mFirstIn;
 
-    public DataAdapter(Context context,List<DataBean> data){
+    public DataAdapter(Context context,List<DataBean> data,ListView listView){
 
         mlist=data;
         inflater=LayoutInflater.from(context);
-        mImageLoader=new ImageLoader();
-
-
+        mImageLoader=new ImageLoader(listView);
+        URLS=new String[data.size()];
+        for (int i = 0; i <data.size() ; i++) {
+            URLS[i]=data.get(i).imageIconURL;
+        }
+        mFirstIn=true;
+        listView.setOnScrollListener(this);
 }
 
     @Override
@@ -72,7 +79,27 @@ public class DataAdapter extends BaseAdapter
         return convertView;
     }
 
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+        if(scrollState==SCROLL_STATE_IDLE)
+        {
+            mImageLoader.loadImage(mStart,mEnd);
+        }else {
+            mImageLoader.cancelAllTasks();
+        }
+    }
 
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+        mStart=firstVisibleItem;
+        mEnd=firstVisibleItem+visibleItemCount;
+        if (mFirstIn&&visibleItemCount>0)
+        {
+            mImageLoader.loadImage(mStart,mEnd  );
+            mFirstIn=false;
+        }
+    }
 
 
     class ViewHolder{

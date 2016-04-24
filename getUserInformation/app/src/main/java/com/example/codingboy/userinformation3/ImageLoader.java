@@ -57,9 +57,13 @@ import java.util.Set;
 public class ImageLoader  {
 
     private LruCache<String,Bitmap> mCathes;
+    private ListView mListView;
+    private Set<MyAsyncTask>mTask;
 
-    public ImageLoader()
+    public ImageLoader(ListView listView)
     {
+        mListView=listView;
+        mTask=new HashSet<>();
         int maxMemory= (int) Runtime.getRuntime().maxMemory();
         int cacheSize=maxMemory/4;
         mCathes=new LruCache<String ,Bitmap>(cacheSize)
@@ -69,6 +73,16 @@ public class ImageLoader  {
                 return value.getByteCount();
             }
         };
+    }
+    public void cancelAllTasks()
+    {
+        if(mTask!=null)
+        {
+            for(MyAsyncTask task:mTask)
+            {
+                task.cancel(false);
+            }
+        }
     }
 
     public void addBitmapToCache(String url,Bitmap bitmap)
@@ -114,20 +128,37 @@ public class ImageLoader  {
         Bitmap bitmap=getBitmapFromCache(url);
         if(bitmap==null) {
             //如果缓存中没有，则必须去网络中下载。
-            new MyAsyncTask(imageView,url).execute(url);
-        }else {
+            imageView.setImageResource(R.drawable.d);
+        }else
+        {
             imageView.setImageBitmap(bitmap);
+        }
+    }
+    public void loadImage(int start,int end)
+    {
+        for (int i = start; i <end ; i++) {
+            String url=DataAdapter.URLS[i];
+            Bitmap bitmap=getBitmapFromCache(url);
+            if(bitmap==null) {
+                //如果缓存中没有，则必须去网络中下载。
+                MyAsyncTask myAsyncTask=new MyAsyncTask(url);
+                myAsyncTask.execute(url);
+                mTask.add(myAsyncTask);
+            }else {
+                ImageView imageView= (ImageView) mListView.findViewWithTag(url);
+                imageView.setImageBitmap(bitmap);
+            }
         }
     }
 
 
     public class MyAsyncTask extends AsyncTask<String,Void,Bitmap>
     {
-      private ImageView mImageView;
+//      private ImageView mImageView;
         private String mUrl;
-        public MyAsyncTask(ImageView imageView,String url)
+        public MyAsyncTask(String url)
         {
-           mImageView=imageView;
+//           mImageView=imageView;
             mUrl=url;
         }
 
@@ -145,10 +176,13 @@ public class ImageLoader  {
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
-            if(mImageView.getTag().equals(mUrl))
+            ImageView imageView= (ImageView) mListView.findViewWithTag(mUrl);
+            if(imageView!=null&&bitmap!=null)
             {
-                mImageView.setImageBitmap(bitmap);
+                imageView.setImageBitmap(bitmap);
             }
+            mTask.remove(this);
+
         }
     }
 
